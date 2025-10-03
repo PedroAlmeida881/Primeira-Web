@@ -1,122 +1,509 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Saudação</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz de Conhecimentos Gerais</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#470585">
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-    
-    <style>
-        body{
-            transition: background-color 2.5s;
-            font-family: Arial, Helvetica, sans-serif;
-            color: rgb(7, 7, 7);
-            font-size: 20px;
-            text-align: center;
-            padding-top: 70px;
-            background-size: cover; /* Faz a imagem cobrir toda a tela */
-            background-position: center; /* Centraliza a imagem */
-            background-attachment: fixed; /* Faz a imagem ficar fixa enquanto rola a página */
-        }
-        .container{
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 758px;
-            margin: 25px auto;
-        }
-        button{
-            padding: 20px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-        @media(max-width: 758px){
-            body{ font-size: 28px; padding-top: 50px;}
-            button{ font-size: 16px; padding: 18px;}
-        }
-    </style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #470585, #00f2fe);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    .quiz-container, #start-container, #ranking-container {
+      background: #000;
+      padding: 25px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 460px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      animation: fadeIn 0.6s ease;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      animation: slideIn 0.6s ease;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: transform 0.2s, background 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .wrong {
+      background: #ff0101 !important;
+      color: white;
+    }
+    .correct {
+      background: green !important;
+      color: rgb(255, 255, 255);
+    }
+    .timer {
+      margin: 10px 0;
+      font-weight: bold;
+      font-size: 1em;
+    }
+    .final {
+      font-size: 1.1em;
+      animation: fadeIn 1s ease;
+      text-align: center;
+      word-wrap: break-word;
+    }
+    table {
+      margin: 12px auto;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table th, table td {
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 6px;
+      text-align: center;
+    }
+    table th {
+      background: rgba(0,0,0,0.45);
+    }
+    @keyframes slideIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    #start-container h1 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+    #start-container p {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+    .btn-main {
+      padding: 10px 22px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #2196f3;
+      color: #fff;
+      transition: 0.3s;
+    }
+    .btn-main:hover {
+      background: #42a5f5;
+      transform: scale(1.05);
+    }
+    .btn-option {
+      padding: 8px 14px;
+      font-size: 0.9em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 6px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    #retry-btn {
+      background: #6f00ff;
+      color: white;
+    }
+    #retry-btn:hover {
+      background: #6f00ff;
+      transform: scale(1.05);
+    }
+    #ranking-btn {
+      background: #ffffff;
+      color: rgb(0, 0, 0);
+    }
+    #ranking-btn:hover {
+      background: #ffffff;
+      transform: scale(1.05);
+    }
+    canvas#fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .small-note {
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.85);
+      margin-top: 8px;
+    }
+    .perfect-img {
+      display: block;
+      margin: 15px auto;
+      max-width: 350px;
+      width: 100%;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity .6s ease;
+    }
+    .perfect-img.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      .question {
+        font-size: 1em;
+      }
+      .timer {
+        font-size: 0.95em;
+      }
+      .final {
+        font-size: 1em;
+      }
+      .btn-option, .btn-main {
+        font-size: 0.95em;
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    
-    <div class="container">
-        <h1 id="titulo">Bem-vindo(a)!</h1>
-        <p id="frase">Clique no botão abaixo para mudar a cor da página de acordo com o horário do dia.</p>
-        <p id="hora"></p>
-        <p id="data"></p>
-        <button onclick="trocar()" id="botao">Mudar cor</button>
-        <p id="frase"></p>
+
+  <div id="start-container">
+    <h1>Quiz - Conhecimentos Gerais</h1>
+    <p>Clique no botão para começar o jogo de perguntas!</p>
+    <button id="start-btn" class="btn-main">Começar</button>
+  </div>
+
+  <!-- Quiz -->
+  <div class="quiz-container" id="quiz" style="display:none;">
+  </div>
+
+  <div class="quiz-container" id="ranking-container" style="display:none;">
+    <h2>🏆 Ranking</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Pos</th>
+          <th>Jogador</th>
+          <th>Pontos</th>
+          <th>Acertos</th>
+          <th>Erros</th>
+        </tr>
+      </thead>
+      <tbody id="ranking-body"></tbody>
+    </table>
+    <button class="btn-option" id="back-btn">Voltar</button>
+  </div>
+
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    const quizData = [
+      { question: "1) Qual é a capital do Brasil?", answers: ["Rio de Janeiro","Brasília","São Paulo","Salvador"], correct: "Brasília" },
+      { question: "2) Quem pintou a Mona Lisa?", answers: ["Van Gogh","Leonardo da Vinci","Michelangelo","Picasso"], correct: "Leonardo da Vinci" },
+      { question: "3) Quantos planetas existem no Sistema Solar?", answers: ["7","8","9","10"], correct: "8" },
+      { question: "4) Qual é o maior oceano do mundo?", answers: ["Atlântico","Índico","Ártico","Pacífico"], correct: "Pacífico" },
+      { question: "5) Quem descobriu o Brasil em 1500?", answers: ["Cristóvão Colombo","Pedro Álvares Cabral","Vasco da Gama","Dom Pedro I"], correct: "Pedro Álvares Cabral" },
+      { question: "6) Em que continente fica o Egito?", answers: ["África","Ásia","Europa","América"], correct: "África" },
+      { question: "7) Qual é o menor país do mundo?", answers: ["Mônaco","Vaticano","San Marino","Andorra"], correct: "Vaticano" },
+      { question: "8) Qual é o elemento químico representado por O?", answers: ["Ouro","Oxigênio","Prata","Hidrogênio"], correct: "Oxigênio" },
+      { question: "9) Quantos lados tem um hexágono?", answers: ["5","6","7","8"], correct: "6" },
+      { question: "10) Quem escreveu 'Dom Quixote'?", answers: ["Machado de Assis","Cervantes","Camões","Shakespeare"], correct: "Cervantes" }
+    ];
+
+    // estado
+    let currentQuestion = 0;
+    let score = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let timer = null;
+    const timeLimit = 15;
+    let answered = false;
+
+    const startContainer = document.getElementById('start-container');
+    const quizContainer = document.getElementById('quiz');
+    const rankingContainer = document.getElementById('ranking-container');
+    const rankingBody = document.getElementById('ranking-body');
+
+    let progressEl, questionEl, answersEl, timerEl, feedbackEl;
+
+    document.addEventListener('click', (e) => {
+      const id = e.target.id;
+
+      if (id === 'start-btn') {
+        startQuiz();
+        return;
+      }
+      if (id === 'retry-btn') {
+        startQuiz();
+        return;
+      }
+      if (id === 'ranking-btn') {
+        showRanking();
+        return;
+      }
+      if (id === 'back-btn') {
+        rankingContainer.style.display = 'none';
+        startContainer.style.display = 'block';
+        quizContainer.style.display = 'none';
+        return;
+      }
+    });
+
+    function startQuiz() {
+      // reset estado
+      currentQuestion = 0;
+      score = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      answered = false;
+
+      startContainer.style.display = 'none';
+      rankingContainer.style.display = 'none';
+      quizContainer.style.display = 'block';
+
+      quizContainer.innerHTML = `
+        <div id="progress"></div>
+        <div class="question" id="question">Carregando pergunta...</div>
+        <div class="answers" id="answers"></div>
+        <div class="timer" id="timer"></div>
+        <div id="feedback" class="small-note"></div>
+      `;
+      progressEl = document.getElementById('progress');
+      questionEl = document.getElementById('question');
+      answersEl = document.getElementById('answers');
+      timerEl = document.getElementById('timer');
+      feedbackEl = document.getElementById('feedback');
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion >= quizData.length) return showFinal();
+
+      answered = false;
+      const q = quizData[currentQuestion];
+      progressEl.textContent = `Pergunta ${currentQuestion + 1} de ${quizData.length}`;
+      questionEl.textContent = q.question;
+      answersEl.innerHTML = '';
+      feedbackEl.textContent = '';
+      let timeLeft = timeLimit;
+      timerEl.textContent = `⏳ Tempo: ${timeLeft}s`;
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏳ Tempo: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          onTimeUp();
+        }
+      }, 1000);
+      q.answers.forEach(ans => {
+        const btn = document.createElement('button');
+        btn.textContent = ans;
+        btn.addEventListener('click', () => handleAnswer(btn, ans));
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(btn, ans) {
+      if (answered) return;
+      answered = true;
+      clearInterval(timer);
+      disableAnswerButtons();
+
+      if (ans === quizData[currentQuestion].correct) {
+        score += 3;
+        correctCount++;
+        btn.classList.add('correct');
+        feedbackEl.textContent = '✅ Acertou! (+3 pontos)';
+      } else {
+        wrongCount++;
+        btn.classList.add('wrong');
+        feedbackEl.textContent = '❌ Errou! (sem pontos)';
+      }
+
+      setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+      }, 800);
+    }
+
+    function disableAnswerButtons() {
+      const all = answersEl.querySelectorAll('button');
+      all.forEach(b => b.disabled = true);
+    }
+    function onTimeUp() {
+      quizContainer.innerHTML = `
+        <div class="final">
+          ⏰ Putz, o tempo acabou!<br>
+          Seja mais rápido na próxima!<br><br>
+          Sua pontuação: ${score}
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn-option" id="retry-btn">Tentar novamente</button>
+        </div>
+      `;
+    }
+    function showFinal() {
+  clearInterval(timer);
+
+  const maxScore = quizData.length * 3;
+  let msg = '';
+  let extra = '';
+  let showImage = false;
+  let imagem = '';
+
+  if (score === maxScore && correctCount === quizData.length) {
+    msg = "Uau! Você acertou todas as perguntas — parabéns! 🥳";
+    extra = "background:#000;color:#fff;padding:15px;border-radius:12px;";
+    showImage = true;
+  } else if (score === 0) {
+    msg = "Você terminou sem pontos — tente novamente!";
+    imagem = "https://media.tenor.com/NC6CcwwQwxgAAAAM/lobo.gif";
+  } else if (score < maxScore / 2) {
+    msg = "Você conseguiu alguns pontos, continue praticando!";
+     imagem = "https://i.pinimg.com/736x/b4/f3/69/b4f369ecc974f83b1d7e153f6ffdb125.jpg"
+  } else {
+    msg = "Muito bem! Você quase acertou tudo, não desista!";
+    imagem = "https://i.pinimg.com/1200x/e6/9b/f6/e69bf6424e9468716f7762aa67fb34c9.jpg"
+  }
+
+  const nome = (prompt("Digite seu nome para salvar no ranking:") || "Jogador").trim() || "Jogador";
+  const resultados = JSON.parse(localStorage.getItem("rankingQuiz")) || [];
+  resultados.push({ nome, score, correct: correctCount, wrong: wrongCount, date: new Date().toLocaleString() });
+  resultados.sort((a, b) => b.score - a.score);
+  localStorage.setItem("rankingQuiz", JSON.stringify(resultados));
+
+  quizContainer.innerHTML = `
+    <div class="final" style="${extra}">
+      🎉 Fim do Quiz! 🎉<br>
+      Sua pontuação final: <strong>${score}</strong><br>
+      ${msg}
+      <p style="margin-top:10px;font-size:0.95em;">Acertos: <strong>${correctCount}</strong> | Erros: <strong>${wrongCount}</strong></p>
+      ${showImage ? `<img src="https://pbs.twimg.com/media/GaI192vXYAA38JG.jpg" class="perfect-img show" alt="Parabéns!">` : ''}
+      ${imagem ? `<img src="${imagem}" class="perfect-img show" alt="GIF">` : ''}
+      <div style="margin-top:10px;">
+        <button class="btn-option" id="retry-btn">Tentar novamente</button>
+        <button class="btn-option" id="ranking-btn">Ranking</button>
+      </div>
     </div>
-    <script>
-        function trocar(){
-            const agora = new Date();
-            const hora = agora.getHours();
-            const minutos = agora.getMinutes().toString().padStart(2, "0");
-            let segundos = agora.getSeconds().toString().padStart(2, "0");
-            const opcoes = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
-            const dataFormatada = agora.toLocaleDateString("pt-BR", opcoes);
-            document.getElementById("botao").style.display = "none";
-            let imagem;
-            let mensagem;
+  `;
 
-            if(hora >= 6 && hora < 12){
-                mensagem = "Bom dia! ☀️";
-                frases = ["Bom dia! Que seu dia seja cheio de luz e alegria.", "Acorda! O mundo te espera com novas oportunidades. Bom dia!", "Hoje é um novo dia para conquistar seus sonhos. Bom dia!"];
-                imagem = "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')";
-            }
+  if (showImage) {
+    const img = quizContainer.querySelector('.perfect-img');
+    if (img) {
+      setTimeout(() => img.classList.add('show'), 40);
+    }
+    setTimeout(() => launchFireworks(), 150);
+  }
+}
 
-            else if(hora >= 12 && hora < 18){
-                mensagem = "Boa tarde! ⛅";
-                frases = ["Boa tarde! Que sua tarde seja leve e cheia de paz.", "Boa tarde! Que as boas energias te encontrem agora.", "Siga firme! Ainda há muito dia pra brilhar. Boa tarde!"];
-                imagem = "url('https://images.pexels.com/photos/2386144/pexels-photo-2386144.jpeg?cs=srgb&dl=pexels-anderson-martinsz-2386144.jpg&fm=jpg')";
-            }
+    function showRanking() {
+      quizContainer.style.display = 'none';
+      rankingContainer.style.display = 'block';
+      const resultados = JSON.parse(localStorage.getItem("rankingQuiz")) || [];
+      rankingBody.innerHTML = '';
+      resultados.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${idx+1}</td><td>${escapeHtml(r.nome)}</td><td>${r.score}</td><td>${r.correct}</td><td>${r.wrong}</td>`;
+        rankingBody.appendChild(tr);
+      });
+    }
 
-            else if(hora >= 18 && hora < 23){
-                mensagem = "Boa noite! 🌕";
-                frases = ["Boa noite! Que os seus sonhos sejam tão doces quanto seu coração.", "Boa noite! Que a paz te envolva e te faça sonhar tranquilo.", "Boa noite! Que as estrelas iluminem seus sonhos."];
-                imagem = "url('https://static.vecteezy.com/ti/fotos-gratis/t1/22751189-cheio-lua-sobre-a-rio-dentro-a-floresta-as-noite-natureza-fundo-foto.jpg')"
-            }
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
 
-            else{
-                mensagem = "Já era para você estar dormindo!! 🌙 ";
-                frases = ["A noite avançou, é hora de descansar. Durma bem!", "O relógio já virou, agora é só deixar o sono te levar. Boa noite!", "Já é madrugada, a cama está te chamando. Boa noite!"];
-                imagem = "url('https://entaoamocomoresposta.wordpress.com/wp-content/uploads/2010/05/blog-noite.jpg')";
-            }
+    // fireworks (visual)
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
 
-            document.body.style.backgroundImage = imagem;
-            
-            document.getElementById("titulo").innerHTML =  mensagem;
-            document.getElementById("hora").innerHTML = "🕒agora são "+hora+":"+minutos+ ":"+ segundos;
-            document.getElementById("data").innerHTML = "🗓️"+dataFormatada;
+    function launchFireworks() {
+      particles = [];
+      for (let i = 0; i < 200; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          radius: Math.random() * 3 + 2,
+          alpha: 1,
+          color: `hsl(${Math.random() * 360},100%,50%)`
+        });
+      }
+      animateFireworks();
+    }
+
+    function animateFireworks() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
         }
-        let frases = [];
-        function trocarFrase(){
-            if(frases.length > 0){
-                const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
-                document.getElementById("frase").innerHTML = fraseAleatoria;
-            }
-        }
-        trocar();
-        setInterval(trocar, 1000);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      if (particles.length > 0) requestAnimationFrame(animateFireworks);
+    }
 
-        trocarFrase();
-        setInterval(trocarFrase, 5000);
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
 
-        
-    </script>
-
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("service-worker.js")
-             .then(() => console.log("Service Worker registrado"))
-             .catch(err => console.log("Erro no SW:", err));
-        }
-    </script>
-
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service Worker registrado:', reg.scope))
+        .catch(err => console.error('❌ Falha ao registrar Service Worker:', err));
+    });
+  }
+</script>
 </body>
-
 </html>

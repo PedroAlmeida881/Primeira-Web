@@ -1,11 +1,13 @@
 {
-  "name": "App Saudação",
-  "short_name": "Saudação",
+  "name": "Quiz de Conhecimentos Gerais",
+  "short_name": "Quiz",
+  "description": "Teste seus conhecimentos gerais com este quiz divertido!",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#000000",
+  "theme_color": "#470585",
   "orientation": "portrait",
+  "lang": "pt-BR",
   "icons": [
     {
       "src": "icone-192.png",
